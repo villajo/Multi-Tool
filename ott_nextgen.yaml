@@ -21,7 +21,7 @@ db_settings:
     ats_traffic:
       ttl:
     atsec:
-      ttl:
+      ttl: datetime + INTERVAL 60 DAY
     atsec_15m:
       ttl:
     atsec_1d:
@@ -41,7 +41,7 @@ db_settings:
     atsec_video_stats_1m:
       ttl:
     atsmid:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     atsmid_15m:
       ttl:
     atsmid_1d:
@@ -57,13 +57,13 @@ db_settings:
     cache_lookup_history:
       ttl:
     client_ip_stats_5m:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     cmcd_raw:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     conn_states:
       ttl:
     iptable:
-      ttl:
+      ttl: datetime + INTERVAL 60 DAY
     loadstate:
       ttl:
     org_avail_1m_af:
@@ -77,24 +77,24 @@ db_settings:
     syslog:
       ttl:
     tm:
-      ttl:
+      ttl: time + INTERVAL 30 DAY
     tm_app:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     tm_crstates:
       ttl:
     tr_app:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     tr_dns:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     tr_http:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
   comcast_super8:
     super8_access:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     super8_access_1m:
       ttl:
     super8_access_syn:
-      ttl:
+      ttl: datetime + INTERVAL 30 DAY
     super8_access_syn_1m:
       ttl:
     super8_error:
@@ -107,7 +107,7 @@ db_settings:
       ttl:
   comcast_vact:
     metrics_combined_data:
-      ttl: event_time + INTERVAL 3 MONTH
+      ttl:
     metrics_program_groups:
       ttl:
     metrics_sentry_stats:

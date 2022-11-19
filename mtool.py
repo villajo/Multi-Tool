@@ -167,7 +167,7 @@ def print_databases(clusterfile, ssh_client, location):
 def print_table_ttl(clusterfile, ssh_client, location, database, table):
    print(get_table_ttl(clusterfile, ssh_client, location, database, table))
 
-def print_create_statement(clusterfile, ssh_client, location, database, table):
+def print_create_table(clusterfile, ssh_client, location, database, table):
    print(get_create_table(clusterfile, ssh_client, location, database, table))
 
 def print_tc_branch(clusterfile, ssh_client, group, location):
@@ -187,16 +187,21 @@ def set_single_table_ttl(clusterfile, ssh_client, database, table):
       output = int(stdout.read().decode().strip())
       if output == 1:
          if clusterfile['db_settings'][database][table]['ttl'] != None:
-            ttl_query = 'clickhouse-client --database=' + database + ' --query="ALTER TABLE ' + database + '.' + table + ' ON CLUSTER ' + clusterfile['synonyms']['cluster'][location] + ' MODIFY TTL ' + clusterfile['db_settings'][database][table]['ttl']
-            #_,_,_ = ssh_client.exec_command(ttl_query)
+            ttl_query = 'clickhouse-client --database=' + database + ' --query="ALTER TABLE ' + database + '.' + table + ' ON CLUSTER ' + clusterfile['synonyms']['cluster'][location] + ' MODIFY TTL ' + clusterfile['db_settings'][database][table]['ttl'] + '"'
+            _,_,_ = ssh_client.exec_command(ttl_query)
             print(ttl_query)
          else:
-            print("No TTL Whatsoever")
-            ttl_query = 'clickhouse-client --database=' + database + ' --query="ALTER TABLE ' + database + '.' + table + ' ON CLUSTER ' + clusterfile['synonyms']['cluster'][location] + ' REMOVE TTL'
-            #_,_,_ = ssh_client.exec_command(ttl_query)
-            print(ttl_query)
-
+            ttl_query = 'clickhouse-client --database=' + database + ' --query="ALTER TABLE ' + database + '.' + table + ' ON CLUSTER ' + clusterfile['synonyms']['cluster'][location] + ' REMOVE TTL"'
+            _,_,_ = ssh_client.exec_command(ttl_query)
       ssh_client.close()
+
+def set_db_table_ttls(clusterfile, ssh_client, database):
+   print("Setting TTLs can take a long time (EG: Many hours). Be patient epsecially on tables with large amounts of data. ")
+   tables = clusterfile['db_settings'][database]
+   for table in tables:
+      set_single_table_ttl(clusterfile, ssh_client, database, table)
+
+
 
 def set_tc_branch(clusterfile, ssh_client, group, location, tc_branch):
    if group == 'cluster':
@@ -267,9 +272,9 @@ def main():
       else:
          print("usage: python3 mtool.py <FILE> <FUNCTION> <CLUSTER/SYSTEMS> <LOCATION>")
 
-   elif sys.argv[2] == "get_create_table":
+   elif sys.argv[2] == "print_create_table":
       if sys.argv[4] != None:
-         get_table_ttl(clusterfile, ssh_client, sys.argv[3], sys.argv[4], sys.argv[5])
+         print_create_table(clusterfile, ssh_client, sys.argv[3], sys.argv[4], sys.argv[5])
       else:
          print("usage: python3 mtool.py <FILE> <FUNCTION> <LOCATION> <DATABASE> <TABLE>")
    elif sys.argv[2] == "get_database_tables":
@@ -282,7 +287,7 @@ def main():
          print_databases(clusterfile, ssh_client, sys.argv[3])
       else:
          print("usage: python3 mtool.py <FILE> <FUNCTION> <LOCATION>")
-   elif sys.argv[2] == "get_table_ttl":
+   elif sys.argv[2] == "print_table_ttl":
       if sys.argv[4] != None:
          print_table_ttl(clusterfile, ssh_client, sys.argv[3], sys.argv[4], sys.argv[5])
       else:
@@ -290,19 +295,22 @@ def main():
    elif sys.argv[2] == "get_all_pieces_on_cluster":
          find_all_pieces_on_cluster(clusterfile, ssh_client)
          #Example - python3 mtool.py ott_nextgen.yaml get_all_pieces_on_cluster ashburn
-#TODO = get_all_table_ttls
    elif sys.argv[2] == "print_all_table_ttls":
       if sys.argv[3] != None:
          print_all_table_ttls(clusterfile, ssh_client, sys.argv[3])
       else:
          print("usage: python3 mtool.py <FILE> <FUNCTION>")
-
-#TODO - set_single_table_ttl
    elif sys.argv[2] == "set_single_table_ttl":
       if sys.argv[4] != None and sys.argv[3] != None:
          set_single_table_ttl(clusterfile, ssh_client, sys.argv[3], sys.argv[4])
       else:
          print("usage: python3 mtool.py <FILE> <FUNCTION> <DATABASE> <TABLE>")
+#TODO
+   elif sys.argv[2] == "set_db_table_ttls":
+      if sys.argv[3] != None:
+         set_db_table_ttls(clusterfile, ssh_client, sys.argv[3])
+      else:
+         print("usage: python3 mtool.py <FILE> <FUNCTION> <DATABASE>")
 
 #TODO - get_all_pieces
    elif sys.argv[2] == "get_all_pieces":
