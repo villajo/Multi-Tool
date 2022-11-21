@@ -77,7 +77,7 @@ db_settings:
     syslog:
       ttl:
     tm:
-      ttl: time + INTERVAL 30 DAY
+      ttl: datetime + INTERVAL 30 DAY
     tm_app:
       ttl: datetime + INTERVAL 30 DAY
     tm_crstates:
